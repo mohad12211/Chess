@@ -13,6 +13,7 @@
 
 typedef struct {
   Texture2D pieces;
+  int board[64];
 } GameState;
 
 void GameCleanup(void);
