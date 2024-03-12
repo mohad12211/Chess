@@ -14,6 +14,9 @@ debug run_debug: export EXTRA_CFLAGS := -DDEBUG -Og -ggdb3
 server: server.c
 	clang server.c -o build/server
 
+mingw:
+	x86_64-w64-mingw32-gcc -I ~/sources/raylib/src/ src/main.c src/game.c src/piece.c src/network.c  -L. -l:libraylib.a -lwinmm -lgdi32 -lws2_32 -static -o chess.exe
+
 clean:
 	rm -rf build
 

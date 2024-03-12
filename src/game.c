@@ -72,7 +72,7 @@ void GameUpdate(void) {
       col = 7 - col;
     }
 
-    if (GET_COLOR(state.board[row * 8 + col]) == GET_COLOR(state.color) && GET_COLOR(state.turn) == GET_COLOR(state.color)) {
+    if (GET_COLOR(state.board[row * 8 + col]) == GET_COLOR(state.color) && state.turn == state.color) {
       state.selected = row * 8 + col;
     }
   }
