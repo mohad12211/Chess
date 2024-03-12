@@ -1,4 +1,5 @@
 #include <raylib.h>
+#include <raymath.h>
 #include <stdbool.h>
 
 #include "game.h"
@@ -51,6 +52,8 @@ void GameInit(void) {
   state.board[62] = Knight | White;
   state.board[63] = Rook | White;
 
+  state.selected = -1;
+
   // state.sockfd = ConnectionToServer();
 }
 
@@ -78,9 +81,12 @@ void GameUpdate(void) {
       col = 7 - col;
     }
 
-    // SendMoveToServer(state.sockfd, state.selected, row * 8 + col);
-    state.board[row * 8 + col] = state.board[state.selected];
-    state.board[state.selected] = 0;
+    if (state.selected != row * 8 + col) {
+      // SendMoveToServer(state.sockfd, state.selected, row * 8 + col);
+      state.board[row * 8 + col] = state.board[state.selected];
+      state.board[state.selected] = 0;
+    }
+    state.selected = -1;
   }
 
   // int from = 0;
@@ -106,12 +112,17 @@ void GameDraw(void) {
 
   for (int i = 0; i < 64; i++) {
     int piece = state.board[i];
-    Vector2 position = {(i % 8), (int)(i / 8)};
-    if (state.isFlipped) {
-      position.x = 7 - position.x;
-      position.y = 7 - position.y;
+    if (i == state.selected) {
+      Vector2 position = {GetMouseX() - BLOCK_LEN / 2.0, GetMouseY() - BLOCK_LEN / 2.0};
+      PieceDraw(piece, position, state.pieces);
+    } else {
+      Vector2 position = {(i % 8), (int)(i / 8)};
+      if (state.isFlipped) {
+        position.x = 7 - position.x;
+        position.y = 7 - position.y;
+      }
+      PieceDraw(piece, Vector2Scale(position, BLOCK_LEN), state.pieces);
     }
-    PieceDraw(piece, position, state.pieces);
   }
 
   DrawFPS(5, 5);

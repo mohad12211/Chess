@@ -12,5 +12,5 @@ void PieceDraw(const int piece, const Vector2 position, Texture2D pieces) {
     return;
 
   Rectangle source = {type * BLOCK_LEN, color * BLOCK_LEN, BLOCK_LEN, BLOCK_LEN};
-  DrawTextureRec(pieces, source, Vector2Scale(position, BLOCK_LEN), WHITE);
+  DrawTextureRec(pieces, source, position, WHITE);
 }
