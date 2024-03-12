@@ -1,7 +1,6 @@
 #include <arpa/inet.h>
 #include <assert.h>
 #include <poll.h>
-#include <stdio.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
@@ -41,7 +40,6 @@ int main(void) {
       }
       send(player1fd, buffer, 2, 0);
       send(player2fd, buffer, 2, 0);
-      printf("Sent.\n");
     } else if (fds[1].revents & POLLIN) {
       n = recv(player2fd, buffer, 2, 0);
       if (n != 2) {
@@ -49,7 +47,6 @@ int main(void) {
       }
       send(player1fd, buffer, 2, 0);
       send(player2fd, buffer, 2, 0);
-      printf("Sent.\n");
     }
   }
 
