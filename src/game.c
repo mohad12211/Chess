@@ -1,4 +1,5 @@
 #include <raylib.h>
+#include <stdbool.h>
 
 #include "game.h"
 #include "network.h"
@@ -50,13 +51,21 @@ void GameInit(void) {
   state.board[62] = Knight | White;
   state.board[63] = Rook | White;
 
-  state.sockfd = ConnectionToServer();
+  // state.sockfd = ConnectionToServer();
 }
 
 void GameUpdate(void) {
+  if (IsKeyPressed(KEY_F)) {
+    state.isFlipped = !state.isFlipped;
+  }
+
   if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
     int row = GetMouseY() / BLOCK_LEN;
     int col = GetMouseX() / BLOCK_LEN;
+    if (state.isFlipped) {
+      row = 7 - row;
+      col = 7 - col;
+    }
 
     state.selected = row * 8 + col;
   }
@@ -64,20 +73,24 @@ void GameUpdate(void) {
   if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
     int row = GetMouseY() / BLOCK_LEN;
     int col = GetMouseX() / BLOCK_LEN;
+    if (state.isFlipped) {
+      row = 7 - row;
+      col = 7 - col;
+    }
 
-    SendMoveToServer(state.sockfd, state.selected, row * 8 + col);
+    // SendMoveToServer(state.sockfd, state.selected, row * 8 + col);
     state.board[row * 8 + col] = state.board[state.selected];
     state.board[state.selected] = 0;
   }
 
-  int from = 0;
-  int to = 0;
-  if (ReceiveMoveFromServer(state.sockfd, &from, &to)) {
-    if (state.board[from] != 0) {
-      state.board[to] = state.board[from];
-      state.board[from] = 0;
-    }
-  }
+  // int from = 0;
+  // int to = 0;
+  // if (ReceiveMoveFromServer(state.sockfd, &from, &to)) {
+  //   if (state.board[from] != 0) {
+  //     state.board[to] = state.board[from];
+  //     state.board[from] = 0;
+  //   }
+  // }
 }
 
 void GameDraw(void) {
@@ -93,7 +106,11 @@ void GameDraw(void) {
 
   for (int i = 0; i < 64; i++) {
     int piece = state.board[i];
-    Vector2 position = {i % 8, (int)(i / 8)};
+    Vector2 position = {(i % 8), (int)(i / 8)};
+    if (state.isFlipped) {
+      position.x = 7 - position.x;
+      position.y = 7 - position.y;
+    }
     PieceDraw(piece, position, state.pieces);
   }
 

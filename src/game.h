@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include <raylib.h>
+#include <stdbool.h>
 
 #define WIDTH 720
 #define HEIGHT 720
@@ -16,6 +17,7 @@ typedef struct {
   int board[64];
   int selected;
   int sockfd;
+  bool isFlipped;
 } GameState;
 
 void GameCleanup(void);
