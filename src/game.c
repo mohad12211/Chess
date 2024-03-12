@@ -53,50 +53,56 @@ void GameInit(void) {
   state.board[63] = Rook | White;
 
   state.selected = -1;
+  state.color = White;
+  state.turn = White;
 
-  // state.sockfd = ConnectionToServer();
+  state.sockfd = ConnectionToServer();
 }
 
 void GameUpdate(void) {
   if (IsKeyPressed(KEY_F)) {
-    state.isFlipped = !state.isFlipped;
+    state.color = INVERT_COLOR(state.color);
   }
 
   if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
     int row = GetMouseY() / BLOCK_LEN;
     int col = GetMouseX() / BLOCK_LEN;
-    if (state.isFlipped) {
+    if (state.color == Black) {
       row = 7 - row;
       col = 7 - col;
     }
 
-    state.selected = row * 8 + col;
+    if (GET_COLOR(state.board[row * 8 + col]) == GET_COLOR(state.color) && GET_COLOR(state.turn) == GET_COLOR(state.color)) {
+      state.selected = row * 8 + col;
+    }
   }
 
-  if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+  if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && state.selected != -1) {
     int row = GetMouseY() / BLOCK_LEN;
     int col = GetMouseX() / BLOCK_LEN;
-    if (state.isFlipped) {
+    if (state.color == Black) {
       row = 7 - row;
       col = 7 - col;
     }
 
     if (state.selected != row * 8 + col) {
-      // SendMoveToServer(state.sockfd, state.selected, row * 8 + col);
+      SendMoveToServer(state.sockfd, state.selected, row * 8 + col);
       state.board[row * 8 + col] = state.board[state.selected];
       state.board[state.selected] = 0;
+      state.turn = INVERT_COLOR(state.turn);
     }
     state.selected = -1;
   }
 
-  // int from = 0;
-  // int to = 0;
-  // if (ReceiveMoveFromServer(state.sockfd, &from, &to)) {
-  //   if (state.board[from] != 0) {
-  //     state.board[to] = state.board[from];
-  //     state.board[from] = 0;
-  //   }
-  // }
+  int from = 0;
+  int to = 0;
+  if (ReceiveMoveFromServer(state.sockfd, &from, &to)) {
+    if (state.board[from] != 0) {
+      state.board[to] = state.board[from];
+      state.board[from] = 0;
+      state.turn = INVERT_COLOR(state.turn);
+    }
+  }
 }
 
 void GameDraw(void) {
@@ -113,17 +119,19 @@ void GameDraw(void) {
   for (int i = 0; i < 64; i++) {
     int piece = state.board[i];
     if (i == state.selected) {
-      Vector2 position = {GetMouseX() - BLOCK_LEN / 2.0, GetMouseY() - BLOCK_LEN / 2.0};
-      PieceDraw(piece, position, state.pieces);
-    } else {
-      Vector2 position = {(i % 8), (int)(i / 8)};
-      if (state.isFlipped) {
-        position.x = 7 - position.x;
-        position.y = 7 - position.y;
-      }
-      PieceDraw(piece, Vector2Scale(position, BLOCK_LEN), state.pieces);
+      continue;
     }
+    Vector2 position = {(i % 8), (int)(i / 8)};
+    if (state.color == Black) {
+      position.x = 7 - position.x;
+      position.y = 7 - position.y;
+    }
+    PieceDraw(piece, Vector2Scale(position, BLOCK_LEN), state.pieces);
   }
+
+  int piece = state.board[state.selected];
+  Vector2 position = {GetMouseX() - BLOCK_LEN / 2.0, GetMouseY() - BLOCK_LEN / 2.0};
+  PieceDraw(piece, position, state.pieces);
 
   DrawFPS(5, 5);
   EndDrawing();

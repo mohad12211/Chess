@@ -12,7 +12,6 @@
 #include "network.h"
 #include <assert.h>
 #include <stdbool.h>
-#include <stdio.h>
 
 int ConnectionToServer(void) {
 
@@ -62,8 +61,6 @@ bool ReceiveMoveFromServer(int sockfd, int *from, int *to) {
   int n = recv(sockfd, buffer, 2, 0);
   if (n != 2)
     return false;
-
-  printf("Received\n");
 
   *from = buffer[0];
   *to = buffer[1];

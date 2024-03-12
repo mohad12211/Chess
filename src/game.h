@@ -17,7 +17,8 @@ typedef struct {
   int board[64];
   int selected;
   int sockfd;
-  bool isFlipped;
+  int turn;
+  int color;
 } GameState;
 
 void GameCleanup(void);
