@@ -11,6 +11,7 @@
 
 #define WHITE_SQUARE_COLOR ((Color){238, 216, 192, 255})
 #define BLACK_SQUARE_COLOR ((Color){171, 122, 101, 255})
+#define FROM_COLOR ((Color){207, 172, 106, 255})
 
 typedef struct {
   Texture2D pieces;
@@ -19,6 +20,7 @@ typedef struct {
   int sockfd;
   int turn;
   int color;
+  char lastMove[2];
 } GameState;
 
 void GameCleanup(void);

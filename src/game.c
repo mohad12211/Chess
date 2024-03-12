@@ -87,6 +87,8 @@ void GameUpdate(void) {
 
     if (state.selected != row * 8 + col) {
       SendMoveToServer(state.sockfd, state.selected, row * 8 + col);
+      state.lastMove[0] = state.selected;
+      state.lastMove[1] = row * 8 + col;
       state.board[row * 8 + col] = state.board[state.selected];
       state.board[state.selected] = 0;
       state.turn = INVERT_COLOR(state.turn);
@@ -101,6 +103,8 @@ void GameUpdate(void) {
       state.board[to] = state.board[from];
       state.board[from] = 0;
       state.turn = INVERT_COLOR(state.turn);
+      state.lastMove[0] = from;
+      state.lastMove[1] = to;
     }
   }
 }
@@ -116,11 +120,29 @@ void GameDraw(void) {
     }
   }
 
+  if (state.lastMove[0] != 0 || state.lastMove[1] != 0) {
+    int row = (state.lastMove[0] / 8);
+    int col = (state.lastMove[0] % 8);
+    if (state.color == Black) {
+      row = 7 - row;
+      col = 7 - col;
+    }
+    DrawRectangleV((Vector2){col * BLOCK_LEN, row * BLOCK_LEN}, (Vector2){BLOCK_LEN, BLOCK_LEN}, FROM_COLOR);
+
+    row = (state.lastMove[1] / 8);
+    col = (state.lastMove[1] % 8);
+    if (state.color == Black) {
+      row = 7 - row;
+      col = 7 - col;
+    }
+    DrawRectangleV((Vector2){col * BLOCK_LEN, row * BLOCK_LEN}, (Vector2){BLOCK_LEN, BLOCK_LEN}, FROM_COLOR);
+  }
+
   for (int i = 0; i < 64; i++) {
-    int piece = state.board[i];
     if (i == state.selected) {
       continue;
     }
+    int piece = state.board[i];
     Vector2 position = {(i % 8), (int)(i / 8)};
     if (state.color == Black) {
       position.x = 7 - position.x;
