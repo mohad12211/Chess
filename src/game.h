@@ -14,6 +14,7 @@
 typedef struct {
   Texture2D pieces;
   int board[64];
+  int selected;
 } GameState;
 
 void GameCleanup(void);

@@ -50,7 +50,22 @@ void GameInit(void) {
   state.board[63] = Rook | White;
 }
 
-void GameUpdate(void) {}
+void GameUpdate(void) {
+  if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+    int row = GetMouseY() / BLOCK_LEN;
+    int col = GetMouseX() / BLOCK_LEN;
+
+    state.selected = row * 8 + col;
+  }
+
+  if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+    int row = GetMouseY() / BLOCK_LEN;
+    int col = GetMouseX() / BLOCK_LEN;
+
+    state.board[row * 8 + col] = state.board[state.selected];
+    state.board[state.selected] = 0;
+  }
+}
 
 void GameDraw(void) {
   BeginDrawing();
