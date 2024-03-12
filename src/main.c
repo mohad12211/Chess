@@ -34,5 +34,4 @@ int main(void) {
 static void UpdateDrawFrame(void) {
   GameUpdate();
   GameDraw();
-  DrawFPS(5, 5);
 }

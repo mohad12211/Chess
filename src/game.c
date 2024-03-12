@@ -1,6 +1,7 @@
 #include <raylib.h>
 
 #include "game.h"
+#include "network.h"
 #include "piece.h"
 
 static GameState state = {0};
@@ -48,6 +49,8 @@ void GameInit(void) {
   state.board[61] = Bishop | White;
   state.board[62] = Knight | White;
   state.board[63] = Rook | White;
+
+  state.sockfd = ConnectionToServer();
 }
 
 void GameUpdate(void) {
@@ -62,8 +65,18 @@ void GameUpdate(void) {
     int row = GetMouseY() / BLOCK_LEN;
     int col = GetMouseX() / BLOCK_LEN;
 
+    SendMoveToServer(state.sockfd, state.selected, row * 8 + col);
     state.board[row * 8 + col] = state.board[state.selected];
     state.board[state.selected] = 0;
+  }
+
+  int from = 0;
+  int to = 0;
+  if (ReceiveMoveFromServer(state.sockfd, &from, &to)) {
+    if (state.board[from] != 0) {
+      state.board[to] = state.board[from];
+      state.board[from] = 0;
+    }
   }
 }
 
@@ -84,5 +97,6 @@ void GameDraw(void) {
     PieceDraw(piece, position, state.pieces);
   }
 
+  DrawFPS(5, 5);
   EndDrawing();
 }

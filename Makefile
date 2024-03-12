@@ -11,6 +11,9 @@ release run_release: export EXTRA_CFLAGS := -O2 -march=native
 debug run_debug: export PROFILE := Debug
 debug run_debug: export EXTRA_CFLAGS := -DDEBUG -Og -ggdb3
 
+server: server.c
+	clang server.c -o build/server
+
 clean:
 	rm -rf build
 
