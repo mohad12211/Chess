@@ -12,7 +12,9 @@ int main(void) {
   int n = setsockopt(serverfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
   assert(n == 0);
 
-  struct sockaddr_in address = {AF_INET, htons(9876), 0};
+  struct sockaddr_in address = {0};
+  address.sin_family = AF_INET;
+  address.sin_port = htons(9876);
   n = bind(serverfd, (struct sockaddr *)&address, sizeof(address));
   assert(n == 0);
 
