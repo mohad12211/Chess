@@ -9,9 +9,11 @@
 #include <unistd.h>
 #endif
 
-#include "network.h"
 #include <assert.h>
 #include <stdbool.h>
+
+#include "move.h"
+#include "network.h"
 
 int ConnectionToServer(void) {
 
@@ -55,17 +57,14 @@ void SendMoveToServer(int sockfd, char from, char to) {
   assert(n == 2);
 }
 
-bool ReceiveMoveFromServer(int sockfd, int *from, int *to) {
+Move ReceiveMoveFromServer(int sockfd) {
 
   char buffer[2] = {0};
   int n = recv(sockfd, buffer, 2, 0);
   if (n != 2)
-    return false;
+    return (Move){0, 0};
 
-  *from = buffer[0];
-  *to = buffer[1];
-
-  return true;
+  return (Move){63 - buffer[0], 63 - buffer[1]};
 }
 
 int GetColorFromServer(int sockfd) {

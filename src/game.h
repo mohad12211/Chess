@@ -4,6 +4,8 @@
 #include <raylib.h>
 #include <stdbool.h>
 
+#include "move.h"
+
 #define WIDTH 720
 #define HEIGHT 720
 
@@ -11,7 +13,7 @@
 
 #define WHITE_SQUARE_COLOR ((Color){238, 216, 192, 255})
 #define BLACK_SQUARE_COLOR ((Color){171, 122, 101, 255})
-#define FROM_COLOR ((Color){207, 172, 106, 255})
+#define MOVE_COLOR ((Color){207, 172, 106, 255})
 
 typedef struct {
   Texture2D pieces;
@@ -20,7 +22,7 @@ typedef struct {
   int sockfd;
   int turn;
   int color;
-  char lastMove[2];
+  Move lastMove;
 } GameState;
 
 void GameCleanup(void);

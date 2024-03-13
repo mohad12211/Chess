@@ -42,19 +42,17 @@ int main(void) {
     char buffer[2] = {0};
 
     if (fds[0].revents & POLLIN) {
-      n = recv(player1fd, buffer, 2, 0);
+      n = recv(fds[0].fd, buffer, 2, 0);
       if (n != 2) {
         return 0;
       }
-      send(player1fd, buffer, 2, 0);
-      send(player2fd, buffer, 2, 0);
+      send(fds[1].fd, buffer, 2, 0);
     } else if (fds[1].revents & POLLIN) {
-      n = recv(player2fd, buffer, 2, 0);
+      n = recv(fds[1].fd, buffer, 2, 0);
       if (n != 2) {
         return 0;
       }
-      send(player1fd, buffer, 2, 0);
-      send(player2fd, buffer, 2, 0);
+      send(fds[0].fd, buffer, 2, 0);
     }
   }
 

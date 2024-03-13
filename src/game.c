@@ -3,6 +3,7 @@
 #include <stdbool.h>
 
 #include "game.h"
+#include "move.h"
 #include "network.h"
 #include "piece.h"
 
@@ -14,94 +15,117 @@ void GameInit(void) {
   Image pieces_imgage = LoadImage("assets/pieces.png");
   Texture2D pieces = LoadTextureFromImage(pieces_imgage);
   UnloadImage(pieces_imgage);
-
   state.pieces = pieces;
-  state.board[0] = Rook | Black;
-  state.board[1] = Knight | Black;
-  state.board[2] = Bishop | Black;
-  state.board[3] = Queen | Black;
-  state.board[4] = King | Black;
-  state.board[5] = Bishop | Black;
-  state.board[6] = Knight | Black;
-  state.board[7] = Rook | Black;
-
-  state.board[8] = Pawn | Black;
-  state.board[9] = Pawn | Black;
-  state.board[10] = Pawn | Black;
-  state.board[11] = Pawn | Black;
-  state.board[12] = Pawn | Black;
-  state.board[13] = Pawn | Black;
-  state.board[14] = Pawn | Black;
-  state.board[15] = Pawn | Black;
-
-  state.board[48] = Pawn | White;
-  state.board[49] = Pawn | White;
-  state.board[50] = Pawn | White;
-  state.board[51] = Pawn | White;
-  state.board[52] = Pawn | White;
-  state.board[53] = Pawn | White;
-  state.board[54] = Pawn | White;
-  state.board[55] = Pawn | White;
-
-  state.board[56] = Rook | White;
-  state.board[57] = Knight | White;
-  state.board[58] = Bishop | White;
-  state.board[59] = Queen | White;
-  state.board[60] = King | White;
-  state.board[61] = Bishop | White;
-  state.board[62] = Knight | White;
-  state.board[63] = Rook | White;
 
   state.selected = -1;
   state.turn = White;
 
   state.sockfd = ConnectionToServer();
   state.color = GetColorFromServer(state.sockfd);
+
+  if (state.color == Black) {
+    state.board[0] = Rook | White;
+    state.board[1] = Knight | White;
+    state.board[2] = Bishop | White;
+    state.board[3] = King | White;
+    state.board[4] = Queen | White;
+    state.board[5] = Bishop | White;
+    state.board[6] = Knight | White;
+    state.board[7] = Rook | White;
+    state.board[8] = Pawn | White;
+    state.board[9] = Pawn | White;
+    state.board[10] = Pawn | White;
+    state.board[11] = Pawn | White;
+    state.board[12] = Pawn | White;
+    state.board[13] = Pawn | White;
+    state.board[14] = Pawn | White;
+    state.board[15] = Pawn | White;
+
+    state.board[48] = Pawn | Black;
+    state.board[49] = Pawn | Black;
+    state.board[50] = Pawn | Black;
+    state.board[51] = Pawn | Black;
+    state.board[52] = Pawn | Black;
+    state.board[53] = Pawn | Black;
+    state.board[54] = Pawn | Black;
+    state.board[55] = Pawn | Black;
+
+    state.board[56] = Rook | Black;
+    state.board[57] = Knight | Black;
+    state.board[58] = Bishop | Black;
+    state.board[59] = King | Black;
+    state.board[60] = Queen | Black;
+    state.board[61] = Bishop | Black;
+    state.board[62] = Knight | Black;
+    state.board[63] = Rook | Black;
+  } else {
+    state.board[0] = Rook | Black;
+    state.board[1] = Knight | Black;
+    state.board[2] = Bishop | Black;
+    state.board[3] = Queen | Black;
+    state.board[4] = King | Black;
+    state.board[5] = Bishop | Black;
+    state.board[6] = Knight | Black;
+    state.board[7] = Rook | Black;
+
+    state.board[8] = Pawn | Black;
+    state.board[9] = Pawn | Black;
+    state.board[10] = Pawn | Black;
+    state.board[11] = Pawn | Black;
+    state.board[12] = Pawn | Black;
+    state.board[13] = Pawn | Black;
+    state.board[14] = Pawn | Black;
+    state.board[15] = Pawn | Black;
+
+    state.board[48] = Pawn | White;
+    state.board[49] = Pawn | White;
+    state.board[50] = Pawn | White;
+    state.board[51] = Pawn | White;
+    state.board[52] = Pawn | White;
+    state.board[53] = Pawn | White;
+    state.board[54] = Pawn | White;
+    state.board[55] = Pawn | White;
+
+    state.board[56] = Rook | White;
+    state.board[57] = Knight | White;
+    state.board[58] = Bishop | White;
+    state.board[59] = Queen | White;
+    state.board[60] = King | White;
+    state.board[61] = Bishop | White;
+    state.board[62] = Knight | White;
+    state.board[63] = Rook | White;
+  }
 }
 
 void GameUpdate(void) {
   if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-    int row = GetMouseY() / BLOCK_LEN;
-    int col = GetMouseX() / BLOCK_LEN;
-    if (state.color == Black) {
-      row = 7 - row;
-      col = 7 - col;
-    }
+    int from = ((int)(GetMouseY() / BLOCK_LEN) * 8) + (int)(GetMouseX() / BLOCK_LEN);
 
-    if (GET_COLOR(state.board[row * 8 + col]) == GET_COLOR(state.color) && state.turn == state.color) {
-      state.selected = row * 8 + col;
+    if (GET_COLOR(state.board[from]) == GET_COLOR(state.color) && state.turn == state.color) {
+      state.selected = from;
     }
   }
 
   if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && state.selected != -1) {
-    int row = GetMouseY() / BLOCK_LEN;
-    int col = GetMouseX() / BLOCK_LEN;
-    if (state.color == Black) {
-      row = 7 - row;
-      col = 7 - col;
-    }
+    int to = ((int)(GetMouseY() / BLOCK_LEN) * 8) + (int)(GetMouseX() / BLOCK_LEN);
 
-    if (state.selected != row * 8 + col) {
-      SendMoveToServer(state.sockfd, state.selected, row * 8 + col);
-      state.lastMove[0] = state.selected;
-      state.lastMove[1] = row * 8 + col;
-      state.board[row * 8 + col] = state.board[state.selected];
+    if (state.selected != to) {
+      SendMoveToServer(state.sockfd, state.selected, to);
+      state.lastMove = (Move){state.selected, to};
+      state.board[to] = state.board[state.selected];
       state.board[state.selected] = 0;
       state.turn = INVERT_COLOR(state.turn);
     }
+
     state.selected = -1;
   }
 
-  int from = 0;
-  int to = 0;
-  if (ReceiveMoveFromServer(state.sockfd, &from, &to)) {
-    if (state.board[from] != 0) {
-      state.board[to] = state.board[from];
-      state.board[from] = 0;
-      state.turn = INVERT_COLOR(state.turn);
-      state.lastMove[0] = from;
-      state.lastMove[1] = to;
-    }
+  Move move = ReceiveMoveFromServer(state.sockfd);
+  if (!MoveIsNull(move)) {
+    state.board[(int)move.to] = state.board[(int)move.from];
+    state.board[(int)move.from] = 0;
+    state.turn = INVERT_COLOR(state.turn);
+    state.lastMove = move;
   }
 }
 
@@ -116,22 +140,14 @@ void GameDraw(void) {
     }
   }
 
-  if (state.lastMove[0] != 0 || state.lastMove[1] != 0) {
-    int row = (state.lastMove[0] / 8);
-    int col = (state.lastMove[0] % 8);
-    if (state.color == Black) {
-      row = 7 - row;
-      col = 7 - col;
-    }
-    DrawRectangleV((Vector2){col * BLOCK_LEN, row * BLOCK_LEN}, (Vector2){BLOCK_LEN, BLOCK_LEN}, FROM_COLOR);
+  if (!MoveIsNull(state.lastMove)) {
+    int row = (state.lastMove.from / 8);
+    int col = (state.lastMove.from % 8);
+    DrawRectangleV((Vector2){col * BLOCK_LEN, row * BLOCK_LEN}, (Vector2){BLOCK_LEN, BLOCK_LEN}, MOVE_COLOR);
 
-    row = (state.lastMove[1] / 8);
-    col = (state.lastMove[1] % 8);
-    if (state.color == Black) {
-      row = 7 - row;
-      col = 7 - col;
-    }
-    DrawRectangleV((Vector2){col * BLOCK_LEN, row * BLOCK_LEN}, (Vector2){BLOCK_LEN, BLOCK_LEN}, FROM_COLOR);
+    row = (state.lastMove.to / 8);
+    col = (state.lastMove.to % 8);
+    DrawRectangleV((Vector2){col * BLOCK_LEN, row * BLOCK_LEN}, (Vector2){BLOCK_LEN, BLOCK_LEN}, MOVE_COLOR);
   }
 
   for (int i = 0; i < 64; i++) {
@@ -140,10 +156,6 @@ void GameDraw(void) {
     }
     int piece = state.board[i];
     Vector2 position = {(i % 8), (int)(i / 8)};
-    if (state.color == Black) {
-      position.x = 7 - position.x;
-      position.y = 7 - position.y;
-    }
     PieceDraw(piece, Vector2Scale(position, BLOCK_LEN), state.pieces);
   }
 
