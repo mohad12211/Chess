@@ -60,10 +60,6 @@ void GameInit(void) {
 }
 
 void GameUpdate(void) {
-  if (IsKeyPressed(KEY_F)) {
-    state.color = INVERT_COLOR(state.color);
-  }
-
   if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
     int row = GetMouseY() / BLOCK_LEN;
     int col = GetMouseX() / BLOCK_LEN;
