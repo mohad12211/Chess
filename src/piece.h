@@ -18,6 +18,7 @@ typedef enum {
 
 typedef struct {
   PieceType type;
+  bool hasMoved;
   MoveVec legalMoves;
 } Piece;
 

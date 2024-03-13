@@ -4,6 +4,8 @@
 
 bool MoveIsNull(Move move) { return move.start == 0 && move.end == 0; }
 
+bool MoveIsEqual(Move m1, Move m2) { return m1.start == m2.start && m1.end == m2.end; }
+
 Vector2 GetVectorInDirection(Vector2 vector, Direction direction) {
   Vector2 result = vector;
   switch (direction) {

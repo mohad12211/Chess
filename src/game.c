@@ -114,16 +114,23 @@ void GameUpdate(void) {
   if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && state.selected != -1) {
     int end = VectorToIndex(Vector2Scale(GetMousePosition(), 1.0 / BLOCK_LEN));
     Move move = {state.selected, end};
-    state.selected = -1;
 
     if (move.start != move.end) {
-      SendMoveToServer(state.sockfd, move);
-      state.lastMove = move;
-      VecFree(&state.board[move.end].legalMoves);
-      state.board[move.end] = state.board[move.start];
-      state.board[move.start].type = None;
-      state.turn = INVERT_COLOR(state.turn);
+      for (size_t i = 0; i < state.board[state.selected].legalMoves.len; i++) {
+        if (MoveIsEqual(state.board[state.selected].legalMoves.moves[i], move)) {
+          SendMoveToServer(state.sockfd, move);
+          state.lastMove = move;
+          VecFree(&state.board[move.end].legalMoves);
+          state.board[move.end] = state.board[move.start];
+          state.board[move.end].hasMoved = true;
+          state.board[move.start].type = None;
+          state.turn = INVERT_COLOR(state.turn);
+          break;
+        }
+      }
     }
+
+    state.selected = -1;
   }
 
   Move move = ReceiveMoveFromServer(state.sockfd);
@@ -180,7 +187,7 @@ void GameDraw(void) {
 static void CalculateLegalMoves(void) {
   for (int i = 0; i < 64; i++) {
     Piece *piece = &state.board[i];
-    piece->legalMoves.len = 0;
+    VecClear(&piece->legalMoves);
 
     if (GET_COLOR(piece->type) != GET_COLOR(state.color)) {
       continue;
@@ -192,7 +199,7 @@ static void CalculateLegalMoves(void) {
       for (int dir = 0; dir < DirectionCount; dir++) {
         Vector2 end = GetVectorInDirection(start, dir);
         if (!Vector2Equals(end, start) && GET_COLOR(state.board[VectorToIndex(end)].type) != GET_COLOR(state.color)) {
-          VecPush(&piece->legalMoves, ((Move){VectorToIndex(start), VectorToIndex(end)}));
+          VecPush(&piece->legalMoves, ((Move){i, VectorToIndex(end)}));
         }
       }
       break;
@@ -205,8 +212,34 @@ static void CalculateLegalMoves(void) {
       break;
     case Rook:
       break;
-    case Pawn:
+    case Pawn: {
+      Vector2 end = GetVectorInDirection(start, NE);
+      int endIndex = VectorToIndex(end);
+      if (state.board[endIndex].type != None && GET_COLOR(state.board[endIndex].type) != GET_COLOR(state.color)) {
+        VecPush(&piece->legalMoves, ((Move){i, endIndex}));
+      }
+
+      end = GetVectorInDirection(IndexToVector(i), NW);
+      endIndex = VectorToIndex(end);
+      if (state.board[endIndex].type != None && GET_COLOR(state.board[endIndex].type) != GET_COLOR(state.color)) {
+        VecPush(&piece->legalMoves, ((Move){i, endIndex}));
+      }
+
+      end = GetVectorInDirection(start, N);
+      endIndex = VectorToIndex(end);
+      if (state.board[endIndex].type == 0) {
+        VecPush(&piece->legalMoves, ((Move){i, endIndex}));
+      }
+
+      if (!piece->hasMoved) {
+        end = GetVectorInDirection(end, N);
+        if (state.board[VectorToIndex(end)].type == 0) {
+          VecPush(&piece->legalMoves, ((Move){i, VectorToIndex(end)}));
+        }
+      }
+
       break;
+    }
     }
   }
 }
