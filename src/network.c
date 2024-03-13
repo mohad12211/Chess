@@ -67,3 +67,13 @@ bool ReceiveMoveFromServer(int sockfd, int *from, int *to) {
 
   return true;
 }
+
+int GetColorFromServer(int sockfd) {
+  char buffer = 0;
+  int n = 0;
+  do {
+    n = recv(sockfd, &buffer, 1, 0);
+  } while (n != 1);
+
+  return buffer;
+}

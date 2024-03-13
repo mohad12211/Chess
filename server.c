@@ -21,9 +21,15 @@ int main(void) {
 
   int player1fd = accept(serverfd, 0, 0);
   assert(player1fd >= 0);
+  char white = 8;
+  n = send(player1fd, &white, 1, 0);
+  assert(n == 1);
 
   int player2fd = accept(serverfd, 0, 0);
   assert(player2fd >= 0);
+  char black = 16;
+  n = send(player2fd, &black, 1, 0);
+  assert(n == 1);
 
   struct pollfd fds[2] = {{player1fd, POLLIN, 0}, {player2fd, POLLIN, 0}};
 

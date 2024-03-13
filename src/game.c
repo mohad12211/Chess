@@ -53,10 +53,10 @@ void GameInit(void) {
   state.board[63] = Rook | White;
 
   state.selected = -1;
-  state.color = White;
   state.turn = White;
 
   state.sockfd = ConnectionToServer();
+  state.color = GetColorFromServer(state.sockfd);
 }
 
 void GameUpdate(void) {
