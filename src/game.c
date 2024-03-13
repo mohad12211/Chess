@@ -100,7 +100,7 @@ void GameInit(void) {
 
 void GameUpdate(void) {
   if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-    int start = ((int)(GetMouseY() / BLOCK_LEN) * 8) + (int)(GetMouseX() / BLOCK_LEN);
+    int start = VectorToIndex(Vector2Scale(GetMousePosition(), 1.0 / BLOCK_LEN));
 
     if (GET_COLOR(state.board[start]) == GET_COLOR(state.color) && state.turn == state.color) {
       state.selected = start;
@@ -108,13 +108,13 @@ void GameUpdate(void) {
   }
 
   if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && state.selected != -1) {
-    int end = ((int)(GetMouseY() / BLOCK_LEN) * 8) + (int)(GetMouseX() / BLOCK_LEN);
+    int end = VectorToIndex(Vector2Scale(GetMousePosition(), 1.0 / BLOCK_LEN));
 
     if (state.selected != end) {
       SendMoveToServer(state.sockfd, state.selected, end);
       state.lastMove = (Move){state.selected, end};
       state.board[end] = state.board[state.selected];
-      state.board[state.selected] = 0;
+      state.board[state.selected] = None;
       state.turn = INVERT_COLOR(state.turn);
     }
 
