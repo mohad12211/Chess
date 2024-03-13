@@ -5,8 +5,8 @@
 #include <stdbool.h>
 
 typedef struct {
-  char start;
-  char end;
+  int start;
+  int end;
 } Move;
 
 bool MoveIsNull(Move move);

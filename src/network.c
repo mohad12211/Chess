@@ -51,8 +51,8 @@ int ConnectionToServer(void) {
   return sockfd;
 }
 
-void SendMoveToServer(int sockfd, char start, char end) {
-  char buf[2] = {start, end};
+void SendMoveToServer(int sockfd, Move move) {
+  char buf[2] = {move.start, move.end};
   int n = send(sockfd, buf, 2, 0);
   assert(n == 2);
 }

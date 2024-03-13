@@ -109,22 +109,22 @@ void GameUpdate(void) {
 
   if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && state.selected != -1) {
     int end = VectorToIndex(Vector2Scale(GetMousePosition(), 1.0 / BLOCK_LEN));
+    Move move = {state.selected, end};
+    state.selected = -1;
 
-    if (state.selected != end) {
-      SendMoveToServer(state.sockfd, state.selected, end);
-      state.lastMove = (Move){state.selected, end};
-      state.board[end] = state.board[state.selected];
-      state.board[state.selected] = None;
+    if (move.start != move.end) {
+      SendMoveToServer(state.sockfd, move);
+      state.lastMove = move;
+      state.board[move.end] = state.board[move.start];
+      state.board[move.start] = None;
       state.turn = INVERT_COLOR(state.turn);
     }
-
-    state.selected = -1;
   }
 
   Move move = ReceiveMoveFromServer(state.sockfd);
   if (!MoveIsNull(move)) {
-    state.board[(int)move.end] = state.board[(int)move.start];
-    state.board[(int)move.start] = 0;
+    state.board[move.end] = state.board[move.start];
+    state.board[move.start] = 0;
     state.turn = INVERT_COLOR(state.turn);
     state.lastMove = move;
   }
