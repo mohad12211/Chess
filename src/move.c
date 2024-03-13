@@ -2,4 +2,4 @@
 
 #include "move.h"
 
-bool MoveIsNull(Move move) { return move.from == 0 && move.to == 0; }
+bool MoveIsNull(Move move) { return move.start == 0 && move.end == 0; }

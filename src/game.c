@@ -6,6 +6,7 @@
 #include "move.h"
 #include "network.h"
 #include "piece.h"
+#include "util.h"
 
 static GameState state = {0};
 
@@ -99,20 +100,20 @@ void GameInit(void) {
 
 void GameUpdate(void) {
   if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-    int from = ((int)(GetMouseY() / BLOCK_LEN) * 8) + (int)(GetMouseX() / BLOCK_LEN);
+    int start = ((int)(GetMouseY() / BLOCK_LEN) * 8) + (int)(GetMouseX() / BLOCK_LEN);
 
-    if (GET_COLOR(state.board[from]) == GET_COLOR(state.color) && state.turn == state.color) {
-      state.selected = from;
+    if (GET_COLOR(state.board[start]) == GET_COLOR(state.color) && state.turn == state.color) {
+      state.selected = start;
     }
   }
 
   if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) && state.selected != -1) {
-    int to = ((int)(GetMouseY() / BLOCK_LEN) * 8) + (int)(GetMouseX() / BLOCK_LEN);
+    int end = ((int)(GetMouseY() / BLOCK_LEN) * 8) + (int)(GetMouseX() / BLOCK_LEN);
 
-    if (state.selected != to) {
-      SendMoveToServer(state.sockfd, state.selected, to);
-      state.lastMove = (Move){state.selected, to};
-      state.board[to] = state.board[state.selected];
+    if (state.selected != end) {
+      SendMoveToServer(state.sockfd, state.selected, end);
+      state.lastMove = (Move){state.selected, end};
+      state.board[end] = state.board[state.selected];
       state.board[state.selected] = 0;
       state.turn = INVERT_COLOR(state.turn);
     }
@@ -122,8 +123,8 @@ void GameUpdate(void) {
 
   Move move = ReceiveMoveFromServer(state.sockfd);
   if (!MoveIsNull(move)) {
-    state.board[(int)move.to] = state.board[(int)move.from];
-    state.board[(int)move.from] = 0;
+    state.board[(int)move.end] = state.board[(int)move.start];
+    state.board[(int)move.start] = 0;
     state.turn = INVERT_COLOR(state.turn);
     state.lastMove = move;
   }
@@ -141,13 +142,8 @@ void GameDraw(void) {
   }
 
   if (!MoveIsNull(state.lastMove)) {
-    int row = (state.lastMove.from / 8);
-    int col = (state.lastMove.from % 8);
-    DrawRectangleV((Vector2){col * BLOCK_LEN, row * BLOCK_LEN}, (Vector2){BLOCK_LEN, BLOCK_LEN}, MOVE_COLOR);
-
-    row = (state.lastMove.to / 8);
-    col = (state.lastMove.to % 8);
-    DrawRectangleV((Vector2){col * BLOCK_LEN, row * BLOCK_LEN}, (Vector2){BLOCK_LEN, BLOCK_LEN}, MOVE_COLOR);
+    DrawRectangleV(Vector2Scale(IndexToVector(state.lastMove.start), BLOCK_LEN), BLOCK_VECTOR, MOVE_COLOR);
+    DrawRectangleV(Vector2Scale(IndexToVector(state.lastMove.end), BLOCK_LEN), BLOCK_VECTOR, MOVE_COLOR);
   }
 
   for (int i = 0; i < 64; i++) {
@@ -155,8 +151,7 @@ void GameDraw(void) {
       continue;
     }
     int piece = state.board[i];
-    Vector2 position = {(i % 8), (int)(i / 8)};
-    PieceDraw(piece, Vector2Scale(position, BLOCK_LEN), state.pieces);
+    PieceDraw(piece, Vector2Scale(IndexToVector(i), BLOCK_LEN), state.pieces);
   }
 
   int piece = state.board[state.selected];
