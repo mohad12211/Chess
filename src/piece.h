@@ -1,6 +1,7 @@
 #ifndef PIECE_H
 #define PIECE_H
 
+#include "move.h"
 #include <raylib.h>
 
 typedef enum {
@@ -13,12 +14,17 @@ typedef enum {
   Pawn = 6,
   White = 8,
   Black = 16,
+} PieceType;
+
+typedef struct {
+  PieceType type;
+  MoveVec legalMoves;
 } Piece;
 
-#define GET_TYPE(piece) ((piece & 7) - 1)
-#define GET_COLOR(piece) ((piece >> 3) - 1)
+#define GET_TYPE(piece) (piece & 7)
+#define GET_COLOR(piece) (piece >> 3)
 #define INVERT_COLOR(color) (24 ^ color)
 
-void PieceDraw(const int piece, const Vector2 position, Texture2D pieces);
+void PieceDraw(const PieceType piece, const Vector2 position, Texture2D pieces);
 
 #endif // PIECE_H
