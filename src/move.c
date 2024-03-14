@@ -10,51 +10,69 @@ Vector2 GetVectorInDirection(Vector2 vector, Direction direction) {
   Vector2 result = vector;
   switch (direction) {
   case N:
-    if (vector.y > 0) {
-      result.y--;
-    }
+    result.y--;
     break;
   case E:
-    if (vector.x < 7) {
-      result.x++;
-    }
+    result.x++;
     break;
   case S:
-    if (vector.y < 7) {
-      result.y++;
-    }
+    result.y++;
     break;
   case W:
-    if (vector.x > 0) {
-      result.x--;
-    }
+    result.x--;
     break;
   case NE:
-    if (vector.y > 0 && vector.x < 7) {
-      result.y--;
-      result.x++;
-    }
+    result.y--;
+    result.x++;
     break;
   case SE:
-    if (vector.y < 7 && vector.x < 7) {
-      result.y++;
-      result.x++;
-    }
+    result.y++;
+    result.x++;
     break;
   case SW:
-    if (vector.y < 7 && vector.x > 0) {
-      result.y++;
-      result.x--;
-    }
+    result.y++;
+    result.x--;
     break;
   case NW:
-    if (vector.y > 0 && vector.x > 0) {
-      result.y--;
-      result.x--;
-    }
+    result.y--;
+    result.x--;
     break;
-  case DirectionCount:
+  case K1:
+    result.y -= 2;
+    result.x++;
+    break;
+  case K2:
+    result.y--;
+    result.x += 2;
+    break;
+  case K4:
+    result.x += 2;
+    result.y++;
+    break;
+  case K5:
+    result.x++;
+    result.y += 2;
+    break;
+  case K7:
+    result.y += 2;
+    result.x--;
+    break;
+  case K8:
+    result.y++;
+    result.x -= 2;
+    break;
+  case K10:
+    result.x -= 2;
+    result.y--;
+    break;
+  case K11:
+    result.y -= 2;
+    result.x--;
     break;
   }
-  return result;
+
+  if (result.x >= 0 && result.x <= 7 && result.y >= 0 && result.y <= 7) {
+    return result;
+  }
+  return vector;
 }

@@ -41,7 +41,24 @@ typedef struct {
     (xs)->len = 0;                                                                                                                                             \
   } while (0)
 
-typedef enum { N, E, S, W, NE, SE, SW, NW, DirectionCount } Direction;
+typedef enum {
+  N,
+  E,
+  S,
+  W,
+  NE,
+  SE,
+  SW,
+  NW,
+  K1,
+  K2,
+  K4,
+  K5,
+  K7,
+  K8,
+  K10,
+  K11,
+} Direction;
 
 bool MoveIsNull(Move move);
 bool MoveIsEqual(Move m1, Move m2);
