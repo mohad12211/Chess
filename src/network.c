@@ -28,8 +28,13 @@ int ConnectionToServer(void) {
   int sockfd = socket(AF_INET, SOCK_STREAM, 0);
   assert(sockfd >= 0);
 
+#ifdef _WIN32
+  const char yes = 1;
+  int n = setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (const char *)&yes, sizeof(yes));
+#else
   int yes = 1;
-  int n = setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
+  int n = setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
+#endif
   assert(n == 0);
 
 #ifdef _WIN32
